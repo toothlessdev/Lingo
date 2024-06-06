@@ -1,8 +1,9 @@
-/* eslint-disable @next/next/no-img-element */
-import { Button } from "@/common/form/Button";
-import { Input } from "@/common/form/Input";
-import { Label } from "@/common/form/Label";
-import { Textarea } from "@/common/form/TextArea";
+/* eslint-disable react/no-unescaped-entities */
+import { Button } from "@/components/form/Button";
+import { Input } from "@/components/form/Input";
+import { Label } from "@/components/form/Label";
+import { Textarea } from "@/components/form/TextArea";
+import Image from "next/image";
 
 export default function ContactPage() {
     return (
@@ -18,7 +19,7 @@ export default function ContactPage() {
                     </div>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="flex items-center">
-                            <img
+                            <Image
                                 alt="Contact Image"
                                 className="rounded-xl object-cover mx-auto "
                                 height="400"
