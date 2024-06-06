@@ -1,13 +1,14 @@
-import { NavBar } from "@/common/navigation/NavBar";
+import { MainLayout } from "@/components/layout/MainLayout";
 import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
     return (
         <Html lang="en">
             <Head />
-            <NavBar />
             <body>
-                <Main />
+                <MainLayout>
+                    <Main />
+                </MainLayout>
                 <NextScript />
             </body>
         </Html>
