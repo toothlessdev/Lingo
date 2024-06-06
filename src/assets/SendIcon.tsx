@@ -1,6 +1,6 @@
 import { ComponentProps } from "react";
 
-export function KeyIcon(props: ComponentProps<"svg">) {
+export function SendIcon(props: ComponentProps<"svg">) {
     return (
         <svg
             {...props}
@@ -14,9 +14,8 @@ export function KeyIcon(props: ComponentProps<"svg">) {
             strokeLinecap="round"
             strokeLinejoin="round"
         >
-            <circle cx="7.5" cy="15.5" r="5.5" />
-            <path d="m21 2-9.6 9.6" />
-            <path d="m15.5 7.5 3 3L22 7l-3-3" />
+            <path d="m22 2-7 20-4-9-9-4Z" />
+            <path d="M22 2 11 13" />
         </svg>
     );
 }

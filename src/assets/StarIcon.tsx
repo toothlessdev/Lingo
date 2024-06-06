@@ -1,6 +1,4 @@
-import { ComponentProps } from "react";
-
-export function KeyIcon(props: ComponentProps<"svg">) {
+export function StarIcon(props: React.ComponentProps<"svg">) {
     return (
         <svg
             {...props}
@@ -14,9 +12,7 @@ export function KeyIcon(props: ComponentProps<"svg">) {
             strokeLinecap="round"
             strokeLinejoin="round"
         >
-            <circle cx="7.5" cy="15.5" r="5.5" />
-            <path d="m21 2-9.6 9.6" />
-            <path d="m15.5 7.5 3 3L22 7l-3-3" />
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
     );
 }
