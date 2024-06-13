@@ -24,7 +24,7 @@ export default function translate() {
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="source-language">Source Language</Label>
-                        <Select defaultValue="en" id="source-language">
+                        <Select defaultValue="en" name="source-language">
                             <SelectTrigger>
                                 <SelectValue placeholder="Select source language" />
                             </SelectTrigger>
@@ -40,7 +40,7 @@ export default function translate() {
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="dest-language">Destination Language</Label>
-                        <Select defaultValue="es" id="dest-language">
+                        <Select defaultValue="es" name="dest-language">
                             <SelectTrigger>
                                 <SelectValue placeholder="Select destination language" />
                             </SelectTrigger>
