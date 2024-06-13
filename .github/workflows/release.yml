@@ -13,8 +13,8 @@ env:
     IMAGE_NAME: lingo-client
 
 jobs:
-    build:
-        runs-on: ubuntu-lateset
+    deploy:
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout Code
               uses: actions/checkout@v4
