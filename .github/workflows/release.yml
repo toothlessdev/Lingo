@@ -34,10 +34,15 @@ jobs:
                   username: ${{ secrets.DOCKER_USER }}
                   password: ${{ secrets.DOCKER_PASSWORD }}
 
-            - name: Build Docker Image and Push DockerHub
+            - name: Build Docker Image
               run: |
                   docker buildx create --use
-                  docker buildx build --platform linux/amd64,linux/arm64 -t ${{ env.IMAGE_NAME }} --push .
+                  docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile -t ${{ env.IMAGE_NAME }}
+
+            - name: Push Image to Dockerhub
+              run: |
+                  docker buildx tag ${{env.IMAGE_NAME}} ${{secrets.DOCKER_USER}}/${{env.IMAGE_NAME}}:latest
+                  docker push ${{secrets.DOCKER_USER}}/${{env.IMAGE_NAME}}:latest
 
             - name: Pull Docker Image and Restart Container
               uses: appleboy/ssh-action@master
@@ -52,5 +57,5 @@ jobs:
                       docker stop ${{env.IMAGE_NAME}}
                       docker rm ${{env.IMAGE_NAME}}
                       docker rmi ${{ env.IMAGE_NAME }}:latest
-                      docker pull ${{ env.IMAGE_NAME }}:latest
-                      docker run -p 80:3000 -d --name ${{env.IMAGE_NAME}} ${{env.IMAGE_NAME}}
+                      docker pull ${{secrets.DOCKER_USER}}/${{ env.IMAGE_NAME }}:latest
+                      docker run -p 80:3000 -d --name ${{env.IMAGE_NAME}}:latest ${{env.IMAGE_NAME}}
