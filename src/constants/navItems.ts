@@ -7,13 +7,13 @@ export interface INavItem {
 export const navItems: INavItem[] = [
     {
         key: 1,
-        text: "How It Works",
-        href: "/principle",
+        text: "About",
+        href: "/about",
     },
     {
         key: 2,
-        text: "Services",
-        href: "/service",
+        text: "Principles",
+        href: "/principle",
     },
     {
         key: 3,
