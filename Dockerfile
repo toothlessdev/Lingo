@@ -1,14 +1,15 @@
-FROM node:21
+FROM node:21-slim
 
-WORKDIR /client
+WORKDIR /lingo-client
 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
 RUN npm ci
 
-COPY public ./public
-COPY src ./src
+COPY . .
+
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]
