@@ -4,6 +4,8 @@ on:
     pull_request:
         branches: ["release"]
         types: ["closed"]
+    push:
+        branches: ["release"]
 
 env:
     HOST: ${{secrets.HOST}}
