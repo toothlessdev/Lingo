@@ -58,4 +58,4 @@ jobs:
                       docker rm ${{env.IMAGE_NAME}} || true
                       docker rmi ${{ env.IMAGE_NAME }}:latest || true
                       docker pull ${{secrets.DOCKER_USER}}/${{ env.IMAGE_NAME }}:latest
-                      docker run -p 80:3000 -d --name ${{env.IMAGE_NAME}}:latest ${{env.IMAGE_NAME}}
+                      docker run -p 80:3000 -d --name ${{env.IMAGE_NAME}} ${{env.IMAGE_NAME}}
