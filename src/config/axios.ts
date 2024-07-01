@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: "",
+    baseURL: `http://${process.env.NEXT_PUBLIC_API_BASE_URL}/lingo-be/api`,
 });
 
 api.interceptors.request.use((config) => {
