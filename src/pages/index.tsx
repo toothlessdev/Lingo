@@ -10,78 +10,26 @@ import { languages } from "@/constants/languages";
 import { useTranslation } from "@/services/translation/useTranslation";
 import { TranslationResult } from "@/components/display/TranslationResult";
 import { HistoryList } from "@/components/display/HistoryList";
-import { useCallback, useRef } from "react";
 
 import { TranslatedWord } from "@/components/display/TranslatedWord";
 import { Input } from "@/components/form/Input";
-import { logService } from "@/services/log/log.service";
-import { toast } from "react-toastify";
-import { Dispatch } from "@reduxjs/toolkit";
-import { useDispatch, useSelector } from "react-redux";
-import { logActions } from "@/store/log.slice";
-import { RootState } from "@/store/store";
 
 export default function Translate(props: InferGetStaticPropsType<typeof getStaticProps>) {
-    const { logs } = useSelector((state: RootState) => state.log);
-    const dispatch: Dispatch = useDispatch();
-
-    const jobRef = useRef<HTMLInputElement | null>(null);
-    const feedbackRef = useRef<HTMLTextAreaElement | null>(null);
-
     const {
         inputRef,
+        jobRef,
+        feedbackRef,
+
+        suggestionModel,
         translatedResult,
+
         handleSrcLangChange,
         handleDestLangChange,
         handleTranslateModelChange,
         handleSuggestionModelChange,
+        handleFeedbackLogSubmit,
         handleTranslate,
-        suggestionModel,
-        setTranslatedResult,
     } = useTranslation();
-
-    const handleSubmit = useCallback(async () => {
-        if (!feedbackRef.current || !jobRef.current) throw new Error("feedbackRef, jobRef is undefined");
-
-        if (feedbackRef.current.value === "") {
-            toast.error("Please enter your feedback!");
-            return;
-        }
-        if (jobRef.current.value === "") {
-            toast.error("Please enter your job!");
-            return;
-        }
-
-        dispatch(
-            logActions.addFeedbackLog({
-                evaluation: {
-                    job: jobRef.current?.value as string,
-                    grade: 0,
-                    feedback: feedbackRef.current?.value as string,
-                },
-            })
-        );
-
-        const logRequest = () => {
-            return logService.log({
-                session: [...logs],
-            });
-        };
-        await toast
-            .promise(logRequest, {
-                pending: "Saving Feedback and Sending Logs...",
-                success: "Log Send Successfully!",
-                error: "Log Send Failed!",
-            })
-            .then(() => {
-                if (!jobRef.current || !feedbackRef.current || !inputRef.current)
-                    throw new Error("feedbackRef, jobRef, inputRef is undefined");
-                jobRef.current.value = "";
-                feedbackRef.current.value = "";
-                inputRef.current.value = "";
-                setTranslatedResult([]);
-            });
-    }, [dispatch, logs, inputRef, setTranslatedResult]);
 
     return (
         <div className="w-full max-w-[1200px] mx-auto p-8 md:p-10 lg:p-12">
@@ -216,7 +164,7 @@ export default function Translate(props: InferGetStaticPropsType<typeof getStati
                         placeholder="Provide feedback on the translation quality..."
                         rows={5}
                     />
-                    <Button className="ml-auto" type="submit" onClick={handleSubmit}>
+                    <Button className="ml-auto" type="submit" onClick={handleFeedbackLogSubmit}>
                         Submit Feedback
                     </Button>
                 </div>
