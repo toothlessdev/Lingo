@@ -30,13 +30,12 @@ export const HistoryList = () => {
                     logs.map((log, index) => {
                         return (
                             <History
-                                key={`${index}-${log.time}`}
+                                key={index}
                                 translationModel={log.translationModel}
-                                srcLang={log.sourceLang}
-                                destLang={log.targetLang}
-                                targetSentence={log.targetSentence}
-                                translatedSentence={log.translatedSentence}
-                                time={log.time}
+                                srcLang={log.sourceLan}
+                                destLang={log.targetLan}
+                                targetSentence={log.targetText}
+                                translatedSentence={log.translatedText}
                             />
                         );
                     })}

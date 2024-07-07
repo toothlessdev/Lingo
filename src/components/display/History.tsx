@@ -8,7 +8,6 @@ export interface IHistory {
 
     targetSentence: string;
     translatedSentence: string;
-    time: string;
 }
 
 export const History: React.FC<IHistory> = ({
@@ -17,7 +16,6 @@ export const History: React.FC<IHistory> = ({
     destLang,
     targetSentence,
     translatedSentence,
-    time,
 }) => {
     return (
         <div className="grid gap-2">
@@ -28,7 +26,7 @@ export const History: React.FC<IHistory> = ({
                         <p className="text-sm text-gray-500">{`Translated from ${srcLang.toUpperCase()} to ${destLang.toUpperCase()}`}</p>
                     </div>
                 </div>
-                <div className="text-sm text-gray-500">{time}</div>
+                {/* <div className="text-sm text-gray-500">{time}</div> */}
             </div>
             <p>{targetSentence}</p>
             <p>{translatedSentence}</p>
