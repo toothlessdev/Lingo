@@ -1,18 +1,8 @@
-import { ILog, LogRequest } from "@/services/log/log.types";
+import { IEvaluationLog, ILog, ISuggestionLog, LogRequest } from "@/services/log/log.types";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-export interface Log {
-    translationModel: string;
-    targetSentence: string;
-    translatedSentence: string;
-
-    sourceLang: string;
-    targetLang: string;
-
-    time: string;
-}
-
-const initialState: { logs: Log[] } = {
+const initialState: { currentLogIndex: number; logs: ILog[] } = {
+    currentLogIndex: -1,
     logs: [],
 };
 
@@ -20,12 +10,26 @@ export const logSlice = createSlice({
     name: "lingo/log",
     initialState,
     reducers: {
-        addLog: (state, action: PayloadAction<Log>) => {
-            const now = new Date();
-            const time = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-            state.logs.push({ ...action.payload, time });
+        addLog: (state, action: PayloadAction<Omit<ILog, "evaluation" | "suggestions">>) => {
+            state.currentLogIndex++;
+            state.logs.push({
+                ...action.payload,
+                suggestions: [],
+            });
         },
+
+        addFeedbackLog: (state, action: PayloadAction<{ evaluation: IEvaluationLog }>) => {
+            state.logs[state.currentLogIndex].evaluation = action.payload.evaluation;
+        },
+
+        addSuggestionLog: (state, action: PayloadAction<{ suggestion: ISuggestionLog }>) => {
+            state.logs[state.currentLogIndex].suggestions?.push({
+                ...action.payload.suggestion,
+            });
+        },
+
         clearLog: (state) => {
+            state.currentLogIndex = -1;
             state.logs = [];
         },
     },
