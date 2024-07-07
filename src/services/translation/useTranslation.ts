@@ -1,9 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useDebouncedInput } from "@/hooks/useDebouncedInput";
 import { translationService } from "@/services/translation/translation.service";
 import { toast } from "react-toastify";
+import { Dispatch } from "@reduxjs/toolkit";
+import { useDispatch } from "react-redux";
+import { logActions } from "@/store/log.slice";
 
 export const useTranslation = () => {
+    const dispatch: Dispatch = useDispatch();
+
     const [isPending, setIsPending] = useState<boolean>(false);
     const [srcLang, setSrcLang] = useState<string>("en");
     const [destLang, setDestLang] = useState<string>("ko");
@@ -44,29 +49,43 @@ export const useTranslation = () => {
             return;
         }
 
-        const request = translationService
-            .translate({
+        const translationRequest = () => {
+            setTranslatedResult([]);
+            return translationService.translate({
                 service: translationModel,
                 query: debouncedValue,
                 sourceLan: srcLang,
                 targetLan: destLang,
                 kwargs: {},
+            });
+        };
+
+        await toast
+            .promise(translationRequest, {
+                pending: "Translating...",
+                success: "Translation Success!",
+                error: "Translation Failed!",
             })
             .then((response) => {
                 setTranslatedResult([...response.translatedResult.split(" ")]);
+                dispatch(
+                    logActions.addLog({
+                        translationModel,
+                        targetText: inputRef.current?.value as string,
+                        sourceLan: srcLang,
+                        targetLan: destLang,
+                        translatedText: response.translatedResult,
+                    })
+                );
             })
             .finally(() => {
                 setIsPending(false);
             });
-
-        toast.promise(request, {
-            pending: "Translating...",
-            success: "Translation Success!",
-            error: "Translation Failed!",
-        });
-    }, [translationModel, suggestionModel, debouncedValue, srcLang, destLang]);
+    }, [translationModel, suggestionModel, debouncedValue, srcLang, destLang, dispatch, inputRef]);
 
     return {
+        srcLang,
+        destLang,
         isPending,
         inputRef,
         outputRef,
@@ -76,6 +95,9 @@ export const useTranslation = () => {
         handleSuggestionModelChange,
         handleInputChange: handleChange,
         translatedResult,
+        setTranslatedResult,
         handleTranslate,
+        translationModel,
+        suggestionModel,
     };
 };
