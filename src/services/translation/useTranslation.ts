@@ -1,5 +1,4 @@
 import { useCallback, useRef, useState } from "react";
-import { useDebouncedInput } from "@/hooks/useDebouncedInput";
 import { translationService } from "@/services/translation/translation.service";
 import { toast } from "react-toastify";
 import { Dispatch } from "@reduxjs/toolkit";
@@ -15,8 +14,8 @@ export const useTranslation = () => {
     const [translationModel, setTranslationModel] = useState<string>("");
     const [suggestionModel, setSuggestionModel] = useState<string>("");
 
-    const { inputRef, handleChange, debouncedValue } = useDebouncedInput(500);
     const [translatedResult, setTranslatedResult] = useState<string[]>([]);
+    const inputRef = useRef<HTMLTextAreaElement>(null);
     const outputRef = useRef<HTMLTextAreaElement>(null);
 
     const handleSrcLangChange = useCallback((value: string) => {
@@ -36,6 +35,8 @@ export const useTranslation = () => {
     }, []);
 
     const handleTranslate = useCallback(async () => {
+        if (!inputRef.current) throw new Error("inputRef is not defined");
+
         if (translationModel === "") {
             toast.error("Select Translation Model");
             return;
@@ -44,7 +45,7 @@ export const useTranslation = () => {
             toast.error("Select Suggestion Model");
             return;
         }
-        if (debouncedValue === "") {
+        if (inputRef.current.value === "") {
             toast.error("Please enter the content you want to translate");
             return;
         }
@@ -53,7 +54,7 @@ export const useTranslation = () => {
             setTranslatedResult([]);
             return translationService.translate({
                 service: translationModel,
-                query: debouncedValue,
+                query: inputRef.current?.value as string,
                 sourceLan: srcLang,
                 targetLan: destLang,
                 kwargs: {},
@@ -81,7 +82,7 @@ export const useTranslation = () => {
             .finally(() => {
                 setIsPending(false);
             });
-    }, [translationModel, suggestionModel, debouncedValue, srcLang, destLang, dispatch, inputRef]);
+    }, [translationModel, suggestionModel, srcLang, destLang, dispatch, inputRef]);
 
     return {
         srcLang,
@@ -93,7 +94,6 @@ export const useTranslation = () => {
         handleDestLangChange,
         handleTranslateModelChange,
         handleSuggestionModelChange,
-        handleInputChange: handleChange,
         translatedResult,
         setTranslatedResult,
         handleTranslate,

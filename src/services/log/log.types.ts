@@ -1,4 +1,3 @@
-import { languages } from "@/constants/languages";
 import { BaseResponse } from "../common/types";
 
 export interface ISuggestionLog {

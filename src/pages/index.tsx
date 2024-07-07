@@ -29,17 +29,13 @@ export default function Translate(props: InferGetStaticPropsType<typeof getStati
     const feedbackRef = useRef<HTMLTextAreaElement | null>(null);
 
     const {
-        srcLang,
-        destLang,
         inputRef,
         translatedResult,
         handleSrcLangChange,
         handleDestLangChange,
         handleTranslateModelChange,
         handleSuggestionModelChange,
-        handleInputChange,
         handleTranslate,
-        translationModel,
         suggestionModel,
         setTranslatedResult,
     } = useTranslation();
@@ -168,7 +164,6 @@ export default function Translate(props: InferGetStaticPropsType<typeof getStati
                     <Label htmlFor="input-text">Input Text</Label>
                     <Textarea
                         ref={inputRef}
-                        onChange={handleInputChange}
                         className="resize-none h-[120px]"
                         id="input-text"
                         placeholder="Enter text to translate..."
