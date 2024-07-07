@@ -4,6 +4,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { suggestionService } from "@/services/suggestion/suggestion.service";
 import { SuggestionResponse } from "@/services/suggestion/suggestion.types";
 import { useCallback, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Dispatch } from "@reduxjs/toolkit";
+import { logActions } from "@/store/log.slice";
 
 export interface ITranslatedWord {
     word: string;
@@ -12,6 +15,8 @@ export interface ITranslatedWord {
 }
 
 export const TranslatedWord: React.FC<ITranslatedWord> = ({ word, sentence, suggestionModel }) => {
+    const dispatch: Dispatch = useDispatch();
+
     const [targetWord, setTargetWord] = useState<string>(word);
 
     const { isPending, data } = useQuery({
@@ -39,7 +44,26 @@ export const TranslatedWord: React.FC<ITranslatedWord> = ({ word, sentence, sugg
                 {isPending === false ? (
                     data?.suggestions.map((suggestionWord) => {
                         return (
-                            <DropdownMenuItem key={suggestionWord} onClick={() => setTargetWord(suggestionWord)}>
+                            <DropdownMenuItem
+                                key={suggestionWord}
+                                onClick={() => {
+                                    setTargetWord(suggestionWord);
+                                    dispatch(
+                                        logActions.addSuggestionLog({
+                                            suggestion: {
+                                                suggestionModel,
+                                                targetWord: 0,
+                                                sentence: true,
+                                                cntxtLen: 0,
+                                                text: sentence,
+                                                abbreviation: false,
+                                                suggestionList: data.suggestions,
+                                                selectedSuggestion: suggestionWord,
+                                            },
+                                        })
+                                    );
+                                }}
+                            >
                                 {suggestionWord}
                             </DropdownMenuItem>
                         );
