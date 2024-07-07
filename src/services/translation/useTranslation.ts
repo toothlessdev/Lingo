@@ -2,10 +2,13 @@ import { useCallback, useRef, useState } from "react";
 import { translationService } from "@/services/translation/translation.service";
 import { toast } from "react-toastify";
 import { Dispatch } from "@reduxjs/toolkit";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logActions } from "@/store/log.slice";
+import { logService } from "../log/log.service";
+import { RootState } from "@/store/store";
 
 export const useTranslation = () => {
+    const { logs } = useSelector((state: RootState) => state.log);
     const dispatch: Dispatch = useDispatch();
 
     const [isPending, setIsPending] = useState<boolean>(false);
@@ -15,8 +18,11 @@ export const useTranslation = () => {
     const [suggestionModel, setSuggestionModel] = useState<string>("");
 
     const [translatedResult, setTranslatedResult] = useState<string[]>([]);
+
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const outputRef = useRef<HTMLTextAreaElement>(null);
+    const jobRef = useRef<HTMLInputElement>(null);
+    const feedbackRef = useRef<HTMLTextAreaElement>(null);
 
     const handleSrcLangChange = useCallback((value: string) => {
         setSrcLang(value);
@@ -84,16 +90,66 @@ export const useTranslation = () => {
             });
     }, [translationModel, suggestionModel, srcLang, destLang, dispatch, inputRef]);
 
+    const handleFeedbackLogSubmit = useCallback(async () => {
+        if (!feedbackRef.current || !jobRef.current) throw new Error("feedbackRef, jobRef is undefined");
+
+        if (feedbackRef.current.value === "") {
+            toast.error("Please enter your feedback!");
+            return;
+        }
+        if (jobRef.current.value === "") {
+            toast.error("Please enter your job!");
+            return;
+        }
+
+        dispatch(
+            logActions.addFeedbackLog({
+                evaluation: {
+                    job: jobRef.current?.value as string,
+                    grade: 0,
+                    feedback: feedbackRef.current?.value as string,
+                },
+            })
+        );
+
+        const logRequest = () => {
+            return logService.log({
+                session: [...logs],
+            });
+        };
+        await toast
+            .promise(logRequest, {
+                pending: "Saving Feedback and Sending Logs...",
+                success: "Log Send Successfully!",
+                error: "Log Send Failed!",
+            })
+            .then(() => {
+                if (!jobRef.current || !feedbackRef.current || !inputRef.current)
+                    throw new Error("feedbackRef, jobRef, inputRef is undefined");
+                jobRef.current.value = "";
+                feedbackRef.current.value = "";
+                inputRef.current.value = "";
+                setTranslatedResult([]);
+            });
+    }, [dispatch]);
+
     return {
+        isPending,
+
         srcLang,
         destLang,
-        isPending,
+
         inputRef,
         outputRef,
+        jobRef,
+        feedbackRef,
+
         handleSrcLangChange,
         handleDestLangChange,
         handleTranslateModelChange,
         handleSuggestionModelChange,
+        handleFeedbackLogSubmit,
+
         translatedResult,
         setTranslatedResult,
         handleTranslate,
