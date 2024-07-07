@@ -47,8 +47,8 @@ jobs:
 
                   # 기존 컨테이너 제거 및 이미지 제거 후 태그 지정후 컨테이너 재시작
                   script: |
-                      docker stop ${{env.IMAGE_NAME}}
-                      docker rm ${{env.IMAGE_NAME}}
+                      docker stop lingo-client
+                      docker rm lingo-client
                       docker rmi ${{ env.IMAGE_NAME }}:latest
                       docker pull ${{ env.IMAGE_NAME }}:latest
-                      docker run -p 80:3000 -d --name ${{env.IMAGE_NAME}} ${{env.IMAGE_NAME}}
+                      docker run -p 80:3000 -d --name ${{env.IMAGE_NAME}} ${{env.IMAGE_NAME}}:latest
