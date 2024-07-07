@@ -10,9 +10,27 @@ import { languages } from "@/constants/languages";
 import { useTranslation } from "@/services/translation/useTranslation";
 import { TranslationResult } from "@/components/display/TranslationResult";
 import { HistoryList } from "@/components/display/HistoryList";
+import { useCallback, useRef } from "react";
+
+import { TranslatedWord } from "@/components/display/TranslatedWord";
+import { Input } from "@/components/form/Input";
+import { logService } from "@/services/log/log.service";
+import { toast } from "react-toastify";
+import { Dispatch } from "@reduxjs/toolkit";
+import { useDispatch, useSelector } from "react-redux";
+import { logActions } from "@/store/log.slice";
+import { RootState } from "@/store/store";
 
 export default function Translate(props: InferGetStaticPropsType<typeof getStaticProps>) {
+    const { logs } = useSelector((state: RootState) => state.log);
+    const dispatch: Dispatch = useDispatch();
+
+    const jobRef = useRef<HTMLInputElement | null>(null);
+    const feedbackRef = useRef<HTMLTextAreaElement | null>(null);
+
     const {
+        srcLang,
+        destLang,
         inputRef,
         translatedResult,
         handleSrcLangChange,
@@ -21,7 +39,53 @@ export default function Translate(props: InferGetStaticPropsType<typeof getStati
         handleSuggestionModelChange,
         handleInputChange,
         handleTranslate,
+        translationModel,
+        suggestionModel,
+        setTranslatedResult,
     } = useTranslation();
+
+    const handleSubmit = useCallback(async () => {
+        if (!feedbackRef.current || !jobRef.current) throw new Error("feedbackRef, jobRef is undefined");
+
+        if (feedbackRef.current.value === "") {
+            toast.error("Please enter your feedback!");
+            return;
+        }
+        if (jobRef.current.value === "") {
+            toast.error("Please enter your job!");
+            return;
+        }
+
+        dispatch(
+            logActions.addFeedbackLog({
+                evaluation: {
+                    job: jobRef.current?.value as string,
+                    grade: 0,
+                    feedback: feedbackRef.current?.value as string,
+                },
+            })
+        );
+
+        const logRequest = () => {
+            return logService.log({
+                session: [...logs],
+            });
+        };
+        await toast
+            .promise(logRequest, {
+                pending: "Saving Feedback and Sending Logs...",
+                success: "Log Send Successfully!",
+                error: "Log Send Failed!",
+            })
+            .then(() => {
+                if (!jobRef.current || !feedbackRef.current || !inputRef.current)
+                    throw new Error("feedbackRef, jobRef, inputRef is undefined");
+                jobRef.current.value = "";
+                feedbackRef.current.value = "";
+                inputRef.current.value = "";
+                setTranslatedResult([]);
+            });
+    }, [dispatch, logs, inputRef, setTranslatedResult]);
 
     return (
         <div className="w-full max-w-[1200px] mx-auto p-8 md:p-10 lg:p-12">
@@ -118,7 +182,11 @@ export default function Translate(props: InferGetStaticPropsType<typeof getStati
                             translatedResult.map((word, index) => {
                                 return (
                                     <div key={index}>
-                                        <span className="whitespace-pre hover:bg-yellow-200 h-fit">{`${word} `}</span>
+                                        <TranslatedWord
+                                            word={word}
+                                            sentence={translatedResult.join(" ")}
+                                            suggestionModel={suggestionModel}
+                                        />
                                     </div>
                                 );
                             })}
@@ -135,6 +203,9 @@ export default function Translate(props: InferGetStaticPropsType<typeof getStati
                     <Label htmlFor="feedback">Feedback</Label>
                     <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1">
+                                <Input ref={jobRef} type="text" placeholder="Your Job" className="mr-3"></Input>
+                            </div>
                             <StarIcon className="w-5 h-5 fill-yellow-500" />
                             <StarIcon className="w-5 h-5 fill-yellow-500" />
                             <StarIcon className="w-5 h-5 fill-yellow-500" />
@@ -144,17 +215,18 @@ export default function Translate(props: InferGetStaticPropsType<typeof getStati
                         <span className="text-sm text-gray-500">3 out of 5</span>
                     </div>
                     <Textarea
+                        ref={feedbackRef}
                         className="resize-none"
                         id="feedback"
                         placeholder="Provide feedback on the translation quality..."
                         rows={5}
                     />
-                    <Button className="ml-auto" type="submit">
+                    <Button className="ml-auto" type="submit" onClick={handleSubmit}>
                         Submit Feedback
                     </Button>
                 </div>
             </div>
-            <HistoryList></HistoryList>
+            <HistoryList />
         </div>
     );
 }
