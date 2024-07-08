@@ -13,12 +13,17 @@ import { HistoryList } from "@/components/display/HistoryList";
 
 import { TranslatedWord } from "@/components/display/TranslatedWord";
 import { Input } from "@/components/form/Input";
+import { useState } from "react";
 
 export default function Translate(props: InferGetStaticPropsType<typeof getStaticProps>) {
+    const [raiting, setRaiting] = useState<number>(0);
+
     const {
         inputRef,
         jobRef,
         feedbackRef,
+
+        destLang,
 
         suggestionModel,
         translatedResult,
@@ -126,6 +131,7 @@ export default function Translate(props: InferGetStaticPropsType<typeof getStati
                                 return (
                                     <div key={index}>
                                         <TranslatedWord
+                                            targetLan={destLang}
                                             word={word}
                                             sentence={translatedResult.join(" ")}
                                             suggestionModel={suggestionModel}
@@ -149,13 +155,19 @@ export default function Translate(props: InferGetStaticPropsType<typeof getStati
                             <div className="flex items-center gap-1">
                                 <Input ref={jobRef} type="text" placeholder="Your Job" className="mr-3"></Input>
                             </div>
-                            <StarIcon className="w-5 h-5 fill-yellow-500" />
-                            <StarIcon className="w-5 h-5 fill-yellow-500" />
-                            <StarIcon className="w-5 h-5 fill-yellow-500" />
-                            <StarIcon className="w-5 h-5 fill-gray-300" />
-                            <StarIcon className="w-5 h-5 fill-gray-300" />
+                            {Array.from({ length: 5 }, (_, i) => i).map((star) => {
+                                return (
+                                    <StarIcon
+                                        key={star}
+                                        className={`w-5 h-5 ${star < raiting ? "fill-yellow-500" : "fill-gray-300"}`}
+                                        onClick={() => {
+                                            setRaiting(star + 1);
+                                        }}
+                                    />
+                                );
+                            })}
                         </div>
-                        <span className="text-sm text-gray-500">3 out of 5</span>
+                        <span className="text-sm text-gray-500">{raiting} out of 5</span>
                     </div>
                     <Textarea
                         ref={feedbackRef}
@@ -164,7 +176,14 @@ export default function Translate(props: InferGetStaticPropsType<typeof getStati
                         placeholder="Provide feedback on the translation quality..."
                         rows={5}
                     />
-                    <Button className="ml-auto" type="submit" onClick={handleFeedbackLogSubmit}>
+                    <Button
+                        className="ml-auto"
+                        type="submit"
+                        onClick={() => {
+                            handleFeedbackLogSubmit(raiting);
+                            setRaiting(0);
+                        }}
+                    >
                         Submit Feedback
                     </Button>
                 </div>

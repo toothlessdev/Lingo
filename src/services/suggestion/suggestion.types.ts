@@ -1,8 +1,9 @@
 import { BaseResponse } from "../common/types";
 
 export type SuggestionRequest = {
-    model: string;
+    suggestionModel: string;
     targetWord: string;
+    lan: string;
     sentence: boolean;
     contextLen: number;
     text: string;
