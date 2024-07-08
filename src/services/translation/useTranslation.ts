@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { translationService } from "@/services/translation/translation.service";
 import { toast } from "react-toastify";
 import { Dispatch } from "@reduxjs/toolkit";
@@ -136,6 +136,28 @@ export const useTranslation = () => {
         [dispatch, logs]
     );
 
+    const handleCloseLog = useCallback(async () => {
+        if (logs.length === 0) return;
+
+        window.onbeforeunload = async () => {
+            const logRequest = () => {
+                return logService.log({
+                    session: [...logs],
+                });
+            };
+
+            await toast.promise(logRequest, {
+                pending: "Sending Log to Server.error.error.",
+                success: "Log Sent Successfully!",
+                error: "Log Send Failed",
+            });
+        };
+    }, [logs]);
+
+    useEffect(() => {
+        handleCloseLog();
+    }, [handleCloseLog]);
+
     return {
         isPending,
 
@@ -152,6 +174,7 @@ export const useTranslation = () => {
         handleTranslateModelChange,
         handleSuggestionModelChange,
         handleFeedbackLogSubmit,
+        handleCloseLog,
 
         translatedResult,
         setTranslatedResult,
