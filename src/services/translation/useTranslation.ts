@@ -90,48 +90,51 @@ export const useTranslation = () => {
             });
     }, [translationModel, suggestionModel, srcLang, destLang, dispatch, inputRef]);
 
-    const handleFeedbackLogSubmit = useCallback(async () => {
-        if (!feedbackRef.current || !jobRef.current) throw new Error("feedbackRef, jobRef is undefined");
+    const handleFeedbackLogSubmit = useCallback(
+        async (raiting: number) => {
+            if (!feedbackRef.current || !jobRef.current) throw new Error("feedbackRef, jobRef is undefined");
 
-        if (feedbackRef.current.value === "") {
-            toast.error("Please enter your feedback!");
-            return;
-        }
-        if (jobRef.current.value === "") {
-            toast.error("Please enter your job!");
-            return;
-        }
+            if (feedbackRef.current.value === "") {
+                toast.error("Please enter your feedback!");
+                return;
+            }
+            if (jobRef.current.value === "") {
+                toast.error("Please enter your job!");
+                return;
+            }
 
-        dispatch(
-            logActions.addFeedbackLog({
-                evaluation: {
-                    job: jobRef.current?.value as string,
-                    grade: 0,
-                    feedback: feedbackRef.current?.value as string,
-                },
-            })
-        );
+            dispatch(
+                logActions.addFeedbackLog({
+                    evaluation: {
+                        job: jobRef.current?.value as string,
+                        grade: raiting,
+                        feedback: feedbackRef.current?.value as string,
+                    },
+                })
+            );
 
-        const logRequest = () => {
-            return logService.log({
-                session: [...logs],
-            });
-        };
-        await toast
-            .promise(logRequest, {
-                pending: "Saving Feedback and Sending Logs...",
-                success: "Log Send Successfully!",
-                error: "Log Send Failed!",
-            })
-            .then(() => {
-                if (!jobRef.current || !feedbackRef.current || !inputRef.current)
-                    throw new Error("feedbackRef, jobRef, inputRef is undefined");
-                jobRef.current.value = "";
-                feedbackRef.current.value = "";
-                inputRef.current.value = "";
-                setTranslatedResult([]);
-            });
-    }, [dispatch]);
+            const logRequest = () => {
+                return logService.log({
+                    session: [...logs],
+                });
+            };
+            await toast
+                .promise(logRequest, {
+                    pending: "Saving Feedback and Sending Logs...",
+                    success: "Log Send Successfully!",
+                    error: "Log Send Failed!",
+                })
+                .then(() => {
+                    if (!jobRef.current || !feedbackRef.current || !inputRef.current)
+                        throw new Error("feedbackRef, jobRef, inputRef is undefined");
+                    jobRef.current.value = "";
+                    feedbackRef.current.value = "";
+                    inputRef.current.value = "";
+                    setTranslatedResult([]);
+                });
+        },
+        [dispatch, logs]
+    );
 
     return {
         isPending,

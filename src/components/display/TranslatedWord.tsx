@@ -8,12 +8,13 @@ import { Dispatch } from "@reduxjs/toolkit";
 import { logActions } from "@/store/log.slice";
 
 export interface ITranslatedWord {
+    targetLan: string;
     word: string;
     sentence: string;
     suggestionModel: string;
 }
 
-export const TranslatedWord: React.FC<ITranslatedWord> = ({ word, sentence, suggestionModel }) => {
+export const TranslatedWord: React.FC<ITranslatedWord> = ({ word, targetLan, sentence, suggestionModel }) => {
     const dispatch: Dispatch = useDispatch();
 
     const [targetWord, setTargetWord] = useState<string>(word);
@@ -22,7 +23,8 @@ export const TranslatedWord: React.FC<ITranslatedWord> = ({ word, sentence, sugg
         queryKey: ["translation", { word, sentence, suggestionModel }],
         queryFn: () =>
             suggestionService.suggestion({
-                model: suggestionModel,
+                suggestionModel,
+                lan: targetLan,
                 targetWord: word,
                 sentence: true,
                 contextLen: 0,
