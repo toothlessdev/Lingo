@@ -9,6 +9,5 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use((response) => {
-    console.log(`[RESPONSE] ${response}`);
     return response;
 });
