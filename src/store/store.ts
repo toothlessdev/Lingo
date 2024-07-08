@@ -1,11 +1,11 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import { logSlice } from "./log.slice";
-import storage from "redux-persist/lib/storage";
+import session from "redux-persist/lib/storage/session";
 
 const persistConfig = {
     key: "root",
-    storage: storage,
+    storage: session,
     whitelist: ["log"],
 };
 
