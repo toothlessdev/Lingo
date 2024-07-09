@@ -12,7 +12,6 @@ export const HistoryList = () => {
     const { logs } = useSelector((state: RootState) => state.log);
 
     const clearHistory = useCallback(() => {
-        console.log("clear");
         dispatch(logActions.clearLog());
     }, [dispatch]);
 

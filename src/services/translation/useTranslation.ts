@@ -139,18 +139,17 @@ export const useTranslation = () => {
     const handleCloseLog = useCallback(async () => {
         if (logs.length === 0) return;
 
-        window.onbeforeunload = async () => {
-            const logRequest = () => {
-                return logService.log({
-                    session: [...logs],
-                });
-            };
+        window.onbeforeunload = (e) => {
+            const log = { session: [...logs] };
 
-            await toast.promise(logRequest, {
-                pending: "Sending Log to Server.error.error.",
-                success: "Log Sent Successfully!",
-                error: "Log Send Failed",
-            });
+            const blob = new Blob([JSON.stringify(log)], { type: "application/json" });
+            navigator.sendBeacon(`http://${process.env.NEXT_PUBLIC_API_BASE_URL}/lingo-be/api/log`, blob);
+
+            toast.loading("Sending Log to Server");
+
+            const message = "You have unsaved changes, do you really want to leave?";
+            e.returnValue = message;
+            return message;
         };
     }, [logs]);
 
