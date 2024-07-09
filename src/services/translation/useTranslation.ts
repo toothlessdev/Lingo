@@ -145,8 +145,6 @@ export const useTranslation = () => {
             const blob = new Blob([JSON.stringify(log)], { type: "application/json" });
             navigator.sendBeacon(`http://${process.env.NEXT_PUBLIC_API_BASE_URL}/lingo-be/api/log`, blob);
 
-            toast.loading("Sending Log to Server");
-
             const message = "You have unsaved changes, do you really want to leave?";
             e.returnValue = message;
             return message;
